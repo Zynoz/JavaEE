@@ -1,11 +1,13 @@
 package at.zynoz.persistence;
 
 import at.zynoz.entity.AbstractBaseEntity;
+import at.zynoz.entity.Student;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,12 +21,15 @@ public abstract class AbstractBaseRepository<ENTITY extends AbstractBaseEntity<E
 
     private final String SQL_COUNT = "SELECT count(1) FROM " + getTableName();
 
+    private final String SQL_GET_ALL = "SELECT * FROM " + getTableName();
+
     private final String SQL_EXISTS = SQL_COUNT + ID_WHERE_CLAUSE;
 
     private PreparedStatement stmtDeleteById;
 
     private PreparedStatement stmtCount;
     private PreparedStatement stmtExists;
+    private PreparedStatement stmtAll;
 
     public final int save(Connection connection, ENTITY entity) {
         return entity.isNew() ? insert(connection, entity) : update(connection, entity);
@@ -87,8 +92,21 @@ public abstract class AbstractBaseRepository<ENTITY extends AbstractBaseEntity<E
     }
 
     @Override
-    public Optional findByAll(Connection connection) {
-        return Optional.empty();
+    public List<Student> findAll(Connection connection) {
+        try {
+            if (stmtAll == null) {
+                stmtAll = connection.prepareStatement(SQL_GET_ALL);
+            }
+            ResultSet rs = stmtAll.executeQuery();
+            while (rs.next()) {
+                System.out.println("FirstName: " + rs.getString(2));
+            }
+//            List<Studens>
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     private int update(Connection connection, ENTITY entity) {
@@ -110,4 +128,5 @@ public abstract class AbstractBaseRepository<ENTITY extends AbstractBaseEntity<E
     protected String getVersionColumnName() {
         return "version";
     }
+
 }

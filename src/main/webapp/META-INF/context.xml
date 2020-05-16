@@ -10,6 +10,6 @@
               maxWait="10000"
               username="studentapp"
               password="studentapp"
-              driverClassName="com.mysql.jdbc.Driver"
-              url="jdbc:mysql://localhost:15432/studentapp"/>
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:15432/studentapp"/>
 </Context>

@@ -1,10 +1,4 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: Titan
-  Date: 03/05/2020
-  Time: 17:00
-  To change this template use File | Settings | File Templates.
---%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -37,17 +31,26 @@
             <th><a href="${pageContext.request.contextPath}/students/add">Neu</a></th>
         </tr>
         </thead>
-        <tr>
-            <td>Maxi</td>
-            <td>Moser</td>
-            <td>19.11.1997</td>
-            <td>03.05.2020</td>
-            <td><a href="/students/edit">Bearbeiten</a> <a href="/students/delete">Löschen</a></td>
-        </tr>
-        <tbody>
 
+        <tbody>
+        <c:forEach items="${students}" var="student" varStatus="studentStatus">
+            <tr>
+                <td>${student.firstName}</td>
+                <td>${student.lastName}</td>
+                <td>${student.birthDate}</td>
+                <td>${student.created}</td>
+                <td>
+                    <a href="${pageContext.request.contextPath}/students/edit?key=%{student.id}">Bearbeiten</a>
+                    <a href="${pageContext.request.contextPath}/students/delete?key=%{student.id}">Löschen</a>
+                </td>
+            </tr>
+        </c:forEach>
         </tbody>
     </table>
+
+    <c:if test="%{empty students}">
+        <h2>No Students found</h2>
+    </c:if>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"

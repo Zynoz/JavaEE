@@ -1,8 +1,10 @@
 package at.zynoz.persistence;
 
 import at.zynoz.entity.AbstractBaseEntity;
+import at.zynoz.entity.Student;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Optional;
 
 public interface Repository<ENTITY extends AbstractBaseEntity<ENTITY, PK>, PK extends Number> {
@@ -19,5 +21,5 @@ public interface Repository<ENTITY extends AbstractBaseEntity<ENTITY, PK>, PK ex
 
     Optional<ENTITY> findById(Connection connection, PK id);
 
-    Optional<ENTITY> findByAll(Connection connection);
+    List<Student> findAll(Connection connection);
 }

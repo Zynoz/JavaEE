@@ -1,6 +1,7 @@
 package at.zynoz.presentation;
 
-import at.zynoz.entity.Students;
+import at.zynoz.entity.Student;
+import at.zynoz.persistence.StudentRepository;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -14,20 +15,22 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/students")
 public class BrowseStudentsServlet extends HttpServlet {
 
     private DataSource ds;
+    private StudentRepository studentRepository;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         try {
             Context initCtx = new InitialContext();
             Context envCon = (Context) initCtx.lookup("java:comp/env");
             ds = (DataSource) envCon.lookup("jdbc/studentapp");
+            studentRepository = new StudentRepository();
             System.out.println("datasource is valid");
         } catch (NamingException e) {
             e.printStackTrace();
@@ -39,17 +42,20 @@ public class BrowseStudentsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try (Connection con = ds.getConnection()) {
             System.out.println("connected to db");
+
+            Long id = Optional.ofNullable(req.getParameter("key")).map(Long::valueOf).orElse(-1L);
+
+            if (id != -1) {
+                Optional<Student> student = studentRepository.findById(con, id);
+                req.setAttribute("student", student);
+                req.getRequestDispatcher("WEB-INF/jsps/edit-student.jsp").forward(req, resp);
+            } else {
+                List<Student> students = studentRepository.findAll(con);
+                req.setAttribute("students", students);
+                req.getRequestDispatcher("WEB-INF/jsps/browse-students.jsp").forward(req, resp);
+            }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        List<Students> students = Collections.emptyList();
-        Students students1 = new Students();
-        Students students2 = new Students();
-        Students students3 = new Students();
-        Students students4 = new Students();
-
-        req.setAttribute("students", students);
-
-        req.getRequestDispatcher("/WEB-INF/jsps/browse-students.jsp").forward(req, resp);
     }
 }
